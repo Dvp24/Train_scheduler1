@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="head w-100 border rounded my-3 text-center">
+      <h1 class="py-5">Anytime is Train time</h1>
+    </div>
+    <div class="trainSchedule w-100 border rounded my-3">
+      <div class="headTS  border rounded px-1">
+        <h6>Train Schedule</h6>
+      </div>
+      <div class="bodyTS">
+        <table class="table text-light">
+          <thead class="border-none">
+            <tr>
+              <th scope="col">Train Name</th>
+              <th scope="col">Destination</th>
+              <th scope="col">First train</th>
+              <th scope="col">frequency</th>
+              <th scope="col">next train</th>
+              <th scope="col">minutes till next</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- table goes here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="addTrain  w-100 border rounded my-3">
+      <div class="headAT border rounded px-1">
+        <h6>Add Train</h6>
+      </div>
+      <div class="bodyAT">
+        <div class="nameTitle mx-3 mt-3"> Train Name</div>
+        <input type="text" class="name mx-3 mb-2 rounded ">
+        <div class="titleDestination  mx-3 mt-3">Destination</div>
+        <input type="text" class="destination mx-3 mb-2 rounded ">
+        <div class="firstTrain  mx-3 mt-3">First Train</div>
+        <input type="text" class="first mx-3 mb-2 rounded ">
+        <div class="frequencyTitle  mx-3 mt-3">Frequency</div>
+        <input type="text" class="frequency mx-3 mb-2 rounded ">
+        <br>
+        <div class="submit btn btn-light  mx-3 my-3">
+          Submit
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.4.2/firebase.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+  <script src="assets/js/logic.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyC9x45xW3swy9UzJAVxLUChFTZosow230Q",
+      authDomain: "train-schedule-24.firebaseapp.com",
+      databaseURL: "https://train-schedule-24.firebaseio.com",
+      projectId: "train-schedule-24",
+      storageBucket: "train-schedule-24.appspot.com",
+      messagingSenderId: "659137664063"
+    };
+    firebase.initializeApp(config);
+    var database = firebase.database();
+    var rowCount = 0;
+    // get existing data from firebase
+    database.ref("b").on("child_added", function (snap) {
+      console.log('tototot' + snap.val());
+      console.log(snap.val().Destination)
+      // print it to the table
+      
+
+      var tFrequency = snap.val().Frequency;
+      console.log("freq"+tFrequency);
+      var tFirst = snap.val().First_Train;
+      console.log("")
+      var firstTimeConverted = moment(tFirst, "HH:mm").subtract(1, "years");
+      console.log(firstTimeConverted);
+      var currentTime = moment();
+      console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
+
+      // Difference between the times
+      var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+      console.log("DIFFERENCE IN TIME: " + diffTime);
+
+      // Time apart (remainder)
+      var tRemainder = diffTime % tFrequency;
+      console.log(tRemainder);
+
+      // Minute Until Train
+      var tMinutesTillTrain = tFrequency - tRemainder;
+      console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+
+      // Next Train
+      var nextTrain = moment().add(tMinutesTillTrain, "minutes");
+      console.log("ARRIVAL TIME: " + moment(nextTrain).format("hh:mm"));
+
+      var row = $("<tr>");
+      row.attr("id", "row-" + rowCount);
+      row.append("<td class='name1'>" + snap.val().Train_name + "</td>");
+      row.append("<td class='dest1'>" + snap.val().Destination + "</td>");
+      row.append("<td class='first1'>" + moment(snap.val().First_Train, "HH:mm").format("hh:mm") + "</td>");
+      row.append("<td class='freq1'>" + snap.val().Frequency + "</td>");
+      row.append("<td class='next1'>" + moment(nextTrain).format("hh:mm") + "</td>");
+      row.append("<td class='min-till'>" + tMinutesTillTrain + "</td>");
+
+      row.appendTo($("tbody"));
+      rowCount++;
+
+    })
+    // WHEN CHILD UPDATES
+    database.ref("b").on("child_changed", function (snap) {
+      console.log('tototot' + snap.val());
+      console.log(snap.val().Destination)
+      // print it to the table
+      
+
+      var tFrequency = snap.val().Frequency;
+      console.log("freq"+tFrequency);
+      var tFirst = snap.val().First_Train;
+      console.log("")
+      var firstTimeConverted = moment(tFirst, "HH:mm").subtract(1, "years");
+      console.log(firstTimeConverted);
+      var currentTime = moment();
+      console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
+
+      // Difference between the times
+      var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+      console.log("DIFFERENCE IN TIME: " + diffTime);
+
+      // Time apart (remainder)
+      var tRemainder = diffTime % tFrequency;
+      console.log(tRemainder);
+
+      // Minute Until Train
+      var tMinutesTillTrain = tFrequency - tRemainder;
+      console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+
+      // Next Train
+      var nextTrain = moment().add(tMinutesTillTrain, "minutes");
+      console.log("ARRIVAL TIME: " + moment(nextTrain).format("hh:mm"));
+
+      var row = $("<tr>");
+      row.attr("id", "row-" + rowCount);
+      row.append("<td class='name1'>" + snap.val().Train_name + "</td>");
+      row.append("<td class='dest1'>" + snap.val().Destination + "</td>");
+      row.append("<td class='first1'>" + moment(snap.val().First_Train, "HH:mm").format("hh:mm") + "</td>");
+      row.append("<td class='freq1'>" + snap.val().Frequency + "</td>");
+      row.append("<td class='next1'>" + moment(nextTrain).format("hh:mm") + "</td>");
+      row.append("<td class='min-till'>" + tMinutesTillTrain + "</td>");
+
+      row.appendTo($("tbody"));
+      rowCount++;
+    });
+    // update time every 30 seconds
+    function timeUpdate() {
+      $("tbody").empty();
+      database.ref("b").once("value", function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          database.ref("b").child(childSnapshot.key).update({
+            currentTime: moment().format("hh:mm:ss")
+          })
+        })
+      })
+    }
+    setInterval(timeUpdate, 10000);
+    $(".submit").on("click", function (event) {
+      event.preventDefault();
+      // get values from input fields and tore them into database using push
+      var train_name = $(".name").val();
+      var destination = $(".destination").val();
+      var first_train = $(".first").val();
+      var frequency = $(".frequency").val();
+      database.ref("b").push({
+        Train_name: train_name,
+        Destination: destination,
+        First_Train: first_train,
+        Frequency: frequency,
+        currentTime: moment().format("hh:mm:ss")
+      })
+    })
+  </script>
+</body>
+
+</html>
